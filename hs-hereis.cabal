@@ -13,23 +13,43 @@ build-type:          Simple
 -- extra-source-files:
 cabal-version:       >=1.10
 
-executable hereis
+library
   hs-source-dirs:      src
-  main-is:             Main.hs
-  ghc-options:         -threaded -rtsopts -with-rtsopts=-N
+  exposed-modules:     Lib
   build-depends:       base >= 4.7 && < 5
                      , cmdargs
   default-language:    Haskell2010
+  other-modules:       CmdOptions
+                     , Control.Hereis
 
-test-suite test
+executable hereis
+  hs-source-dirs:      app
+  main-is:             Main.hs
+  ghc-options:         -threaded -rtsopts -with-rtsopts=-N
+  build-depends:       base
+                     , cmdargs
+                     , hs-hereis
+  default-language:    Haskell2010
+
+test-suite doctest
+  type:                exitcode-stdio-1.0
+  hs-source-dirs:      test
+  main-is:             DocTest.hs
+  build-depends:       base
+                     , doctest
+  ghc-options:         -threaded -rtsopts -with-rtsopts=-N
+  default-language:    Haskell2010
+
+test-suite spec
   type:                exitcode-stdio-1.0
   hs-source-dirs:      test
   main-is:             Spec.hs
   build-depends:       base
+                     , QuickCheck
                      , hs-hereis
                      , test-framework
                      , test-framework-quickcheck2
-                     , QuickCheck
+                     , hspec
   ghc-options:         -threaded -rtsopts -with-rtsopts=-N
   default-language:    Haskell2010
 
