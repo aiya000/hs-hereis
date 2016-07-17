@@ -12,7 +12,7 @@ import System.Console.CmdArgs
 -- | hereis options
 data Options = Options
   { optCd   :: Maybe String
-  , optList :: Maybe Bool
+  , optList :: Bool
   } deriving (Show, Data, Typeable)
 
 
