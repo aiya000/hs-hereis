@@ -1,6 +1,8 @@
+{-# LANGUAGE ScopedTypeVariables #-}
 -- | Module for main
 module Main where
 
+import Control.Exception (catch, SomeException)
 import Lib
 import System.Console.CmdArgs (cmdArgs)
 import System.Environment (getArgs)
@@ -39,7 +41,10 @@ app ["--list"] = undefined
 -- If didn't specify option, register current directory path and name
 app [placeName] = do
   -- if placeName already exists, show warn message and exit
-  registerPlace placeName
+  registerPlace placeName `catch` \(e :: SomeException) -> do
+    putStr $ "adding path is failed.\n" ++
+             "hereis detected an error: "
+    fail (show e)
   putStrLn $ "registered current directory to the name '" ++ placeName ++ "'"
 
 -- If get the undefined arguments
