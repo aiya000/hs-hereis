@@ -17,7 +17,7 @@ readFile' :: (MonadCatch m, MonadIO m) => FilePath -> m PlaceMap
 readFile' filePath = do
   b <- liftIO $ doesFileExist filePath
   if not b
-    then throwM $ FileIOException (filePath ++ " is not exists")
+    then throwM $ IOException (filePath ++ " is not exists")
     else read' <$!> (liftIO $ readFile filePath)
   where
     read' :: String -> PlaceMap

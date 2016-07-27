@@ -5,10 +5,10 @@ module Control.HereisAdd
   ( registerPlace
   ) where
 
-import Control.Exception (SomeException)
 import Control.Hereis
 import Control.Monad (when)
-import Control.Monad.Catch (catch)
+import Control.Monad.Catch (SomeException, catch, MonadCatch, throwM)
+import Control.Monad.IO.Class (MonadIO, liftIO)
 import Data.Hereis
 import Data.Map (insert, empty)
 import Data.Maybe (isNothing, fromJust)
@@ -22,20 +22,27 @@ registerPlace :: String -> IO ()
 registerPlace placeName = do
   configFilePath <- autoMkdirHereisDir
   --TODO: insert to file directly
-  placeMap       <- readFile' configFilePath `catch` \(_ :: SomeException) -> return empty
+  placeMap       <- readFile' configFilePath `catch` replaceEmpty
   currentDirPath <- getCurrentDirectory
   let placeMap' = insert placeName currentDirPath placeMap
   writeFile configFilePath (show placeMap')
+    where
+      replaceEmpty :: SomeException -> IO PlaceMap
+      replaceEmpty _ = return empty
 
 -- Detect filepath of serialized Data.Hereis.PlaceMap value,
 -- and Make working directory if it's not exists.
-autoMkdirHereisDir :: IO FilePath
+autoMkdirHereisDir :: (MonadCatch m, MonadIO m) => m FilePath
 autoMkdirHereisDir = do
-  maybeHomeDir <- getEnv "HOME"
+  maybeHomeDir <- getEnv' "HOME"
   when (isNothing maybeHomeDir) $ do
-    fail "You must set $HOME"
+    throwM $ IOException "You must set $HOME"
   let homeDir = fromJust maybeHomeDir
-  configDir <- (++ "/hereis") <$> getEnvDefault "XDG_CACHE_DIR" (homeDir ++ "/.cache")
-  createDirectoryIfMissing False configDir
+  configDir <- (++ "/hereis") <$> getEnvDefault' "XDG_CACHE_DIR" (homeDir ++ "/.cache")
+  createDirectoryIfMissing' False configDir
   let configFile = configDir ++ "/places"
   return configFile
+    where
+      getEnv' s                      = liftIO $ getEnv s
+      getEnvDefault' x y             = liftIO $ getEnvDefault x y
+      createDirectoryIfMissing' b fp = liftIO $ createDirectoryIfMissing b fp

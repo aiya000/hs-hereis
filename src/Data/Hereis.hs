@@ -1,7 +1,7 @@
 -- | Module for app's data types
 module Data.Hereis
   ( PlaceMap
-  , FileIOException (..)
+  , IOException (..)
   ) where
 
 import Data.Map (Map)
@@ -12,6 +12,6 @@ type Message = String
 -- | Hereis app's tag name and filepath mappings
 type PlaceMap = Map String FilePath
 
--- | An exception for File IO with message
-data FileIOException = FileIOException Message deriving (Show)
-instance Exception FileIOException
+-- | Re defined General Exception with Message for IO
+data IOException = IOException Message deriving (Show)
+instance Exception IOException
