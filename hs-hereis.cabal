@@ -30,6 +30,7 @@ library
   other-modules:       CmdOptions
                      , Control.Hereis
                      , Control.HereisAdd
+                     , Control.HereisCd
                      , Data.Hereis
 
 executable hereis
@@ -39,6 +40,7 @@ executable hereis
   build-depends:       base
                      , cmdargs
                      , hs-hereis
+                     , exceptions
   default-language:    Haskell2010
 
 test-suite doctest

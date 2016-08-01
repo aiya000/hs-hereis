@@ -20,7 +20,8 @@ import System.Posix.Env (getEnv, getEnvDefault)
 --   child dir of $XDG_CACHE_DIR
 registerPlace :: String -> IO ()
 registerPlace placeName = do
-  configFilePath <- autoMkdirHereisDir
+  autoMkdirHereisDir
+  configFilePath <- getAppConfigFilePath
   --TODO: insert to file directly
   placeMap       <- readFile' configFilePath `catch` replaceEmpty
   currentDirPath <- getCurrentDirectory
@@ -30,19 +31,6 @@ registerPlace placeName = do
       replaceEmpty :: SomeException -> IO PlaceMap
       replaceEmpty _ = return empty
 
--- Detect filepath of serialized Data.Hereis.PlaceMap value,
--- and Make working directory if it's not exists.
-autoMkdirHereisDir :: (MonadCatch m, MonadIO m) => m FilePath
-autoMkdirHereisDir = do
-  maybeHomeDir <- getEnv' "HOME"
-  when (isNothing maybeHomeDir) $ do
-    throwM $ IOException "You must set $HOME"
-  let homeDir = fromJust maybeHomeDir
-  configDir <- (++ "/hereis") <$> getEnvDefault' "XDG_CACHE_DIR" (homeDir ++ "/.cache")
-  createDirectoryIfMissing' False configDir
-  let configFile = configDir ++ "/places"
-  return configFile
-    where
-      getEnv' s                      = liftIO $ getEnv s
-      getEnvDefault' x y             = liftIO $ getEnvDefault x y
-      createDirectoryIfMissing' b fp = liftIO $ createDirectoryIfMissing b fp
+      autoMkdirHereisDir :: IO ()
+      autoMkdirHereisDir = getAppConfigDirPath
+                           >>= \fp -> createDirectoryIfMissing False fp

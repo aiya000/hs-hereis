@@ -2,10 +2,10 @@
 -- | Module for main
 module Main where
 
-import Control.Exception (catch, SomeException)
 import Lib
 import System.Console.CmdArgs (cmdArgs)
 import System.Environment (getArgs)
+import Control.Monad.Catch (catch, catches, SomeException, Handler(..))
 
 type Argument = String
 
@@ -33,7 +33,28 @@ app :: [Argument] -> IO ()
 app [] = putStrLn "Nothing to do"
 
 -- If get the option "--cd"
-app ["--cd", placeName] = undefined
+app ["--cd", placeName] = do
+  cdToPlace placeName
+    `catches`
+      [ Handler catchIOException
+      , Handler catchPlaceNameNotFoundException
+      , Handler catchDirectoryNotFoundException
+      , Handler catchOtherwise
+      ]
+    where
+      catchIOException :: IOException' -> IO ()
+      catchIOException (IOException' msg) = fail msg
+
+      catchPlaceNameNotFoundException :: PlaceNameNotFoundException -> IO ()
+      catchPlaceNameNotFoundException _ = fail $ placeName ++ " is never added by hereis"
+
+      catchDirectoryNotFoundException :: DirectoryNotFoundException -> IO ()
+      catchDirectoryNotFoundException (DirectoryNotFoundException msg) = fail msg
+
+      catchOtherwise :: SomeException -> IO ()
+      catchOtherwise e = do
+          putStrLn "hereis: caught unknowed exception"
+          print e
 
 -- If get the option "--list"
 app ["--list"] = undefined
@@ -44,7 +65,7 @@ app [placeName] = do
   registerPlace placeName `catch` \(e :: SomeException) -> do
     putStr $ "adding path is failed.\n" ++
              "hereis detected an error: "
-    fail (show e)
+    fail $ show e
   putStrLn $ "registered current directory to the name '" ++ placeName ++ "'"
 
 -- If get the undefined arguments
