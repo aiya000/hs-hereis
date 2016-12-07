@@ -1,6 +1,6 @@
 {-# LANGUAGE ScopedTypeVariables #-}
 
--- | Module for library modules exporting
+-- | Module for program entry point
 module Data.Hereis.Main ( app )  where
 
 import CmdOptions
@@ -9,11 +9,7 @@ import Control.Hereis
 import Control.HereisAdd
 import System.Console.CmdArgs (cmdArgs)
 
-type Argument = String
-
-
--- |
--- Parse the argument, and to do actions
+-- | Run this app
 --
 -- >>> app []
 -- Nothing to do
@@ -23,7 +19,7 @@ type Argument = String
 -- changed directory to 'place-name'
 -- >>> app ["undefined value"]
 -- Unknowned arguments: ["undefined value"]
-app :: [Argument] -> IO ()
+app :: [String] -> IO ()
 -- If cannot get the argument
 app [] = putStrLn "Nothing to do"
 
