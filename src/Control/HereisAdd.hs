@@ -5,7 +5,6 @@ module Control.HereisAdd
   ( registerPlace
   ) where
 
-import Control.Hereis
 import Control.Monad (when)
 import Control.Monad.Catch (SomeException, catch, MonadCatch, throwM)
 import Control.Monad.IO.Class (MonadIO, liftIO)
