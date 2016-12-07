@@ -3,7 +3,7 @@ module Data.Hereis.Main ( app )  where
 
 import CmdOptions
 import Control.Exception (try, SomeException)
-import Control.HereisAdd
+import Data.Hereis.Add
 import System.Console.CmdArgs (cmdArgs)
 
 -- | Run this app

@@ -1,7 +1,7 @@
 {-# LANGUAGE ScopedTypeVariables #-}
 
--- | Module for app's add action
-module Control.HereisAdd
+-- | For adding action
+module Data.Hereis.Add
   ( registerPlace
   ) where
 
