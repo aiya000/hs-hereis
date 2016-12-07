@@ -15,12 +15,10 @@ cabal-version:       >=1.10
 
 library
   hs-source-dirs:      src
-  exposed-modules:     CmdOptions
-                     , Data.Hereis
+  exposed-modules:     Data.Hereis
                      , Data.Hereis.Add
                      , Data.Hereis.Main
   build-depends:       base >= 4.7 && < 5
-                     , MonadCatchIO-transformers
                      , cmdargs
                      , containers
                      , directory

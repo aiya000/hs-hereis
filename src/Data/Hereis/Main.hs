@@ -1,7 +1,6 @@
 -- | Module for program entry point
 module Data.Hereis.Main ( app )  where
 
-import CmdOptions
 import Control.Exception (try, SomeException)
 import Data.Hereis.Add
 import System.Console.CmdArgs (cmdArgs)
