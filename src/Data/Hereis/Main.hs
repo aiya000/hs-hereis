@@ -1,10 +1,8 @@
-{-# LANGUAGE ScopedTypeVariables #-}
-
 -- | Module for program entry point
 module Data.Hereis.Main ( app )  where
 
 import CmdOptions
-import Control.Exception (catch, SomeException)
+import Control.Exception (try, SomeException)
 import Control.Hereis
 import Control.HereisAdd
 import System.Console.CmdArgs (cmdArgs)
@@ -13,30 +11,30 @@ import System.Console.CmdArgs (cmdArgs)
 --
 -- >>> app []
 -- Nothing to do
--- >>> app ["place-name"]
--- registered current directory to the name 'place-name'
--- >>> app ["--cd", "place-name"]
--- changed directory to 'place-name'
--- >>> app ["undefined value"]
--- Unknowned arguments: ["undefined value"]
+--
+-- >>> import System.Directory (setCurrentDirectory)
+-- >>> setCurrentDirectory "/tmp"
+-- >>> app ["--add", "place-name"]
+-- Current directory was registered as 'place-name'
+--
+-- >>> setCurrentDirectory "/"
+-- >>> app ["--get", "place-name"]
+-- "/tmp"
+--
+-- >>> app ["undefined-value"]
+-- Caught unknown arguments: "undefined-value"
 app :: [String] -> IO ()
--- If cannot get the argument
 app [] = putStrLn "Nothing to do"
 
--- If get the option "--cd"
-app ["--cd", placeName] = undefined
-
--- If get the option "--list"
-app ["--list"] = undefined
-
--- If didn't specify option, register current directory path and name
-app [placeName] = do
+app ["--add", placeName] = do
   -- if placeName already exists, show warn message and exit
-  registerPlace placeName `catch` \(e :: SomeException) -> do
-    putStr $ "adding path is failed.\n" ++
-             "hereis detected an error: "
-    fail (show e)
-  putStrLn $ "registered current directory to the name '" ++ placeName ++ "'"
+  result <- try $ registerPlace placeName
+  case result of
+    Left  e -> putStrLn $ "Detected the error: " ++ show (e :: SomeException)
+    Right _ -> putStrLn $ "Current directory was registered as '" ++ placeName ++ "'"
+app ["--get", placeName] = undefined
 
--- If get the undefined arguments
-app xs = putStrLn $ "Unknowned arguments: " ++ (show xs)
+--TODO:
+--app ["--list"] = undefined
+
+app xs = putStrLn $ "Caught unknown arguments: " ++ show xs
