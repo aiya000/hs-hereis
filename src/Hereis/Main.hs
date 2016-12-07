@@ -1,8 +1,8 @@
 -- | Module for program entry point
-module Data.Hereis.Main ( app )  where
+module Hereis.Main ( app )  where
 
 import Control.Exception (try, SomeException)
-import Data.Hereis.Add
+import Hereis.Add
 import System.Console.CmdArgs (cmdArgs)
 
 -- | Run this app

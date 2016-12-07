@@ -15,9 +15,9 @@ cabal-version:       >=1.10
 
 library
   hs-source-dirs:      src
-  exposed-modules:     Data.Hereis
-                     , Data.Hereis.Add
-                     , Data.Hereis.Main
+  exposed-modules:     Hereis
+                     , Hereis.Add
+                     , Hereis.Main
   build-depends:       base >= 4.7 && < 5
                      , cmdargs
                      , containers

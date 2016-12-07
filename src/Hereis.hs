@@ -1,5 +1,5 @@
 -- | The procedure
-module Data.Hereis
+module Hereis
   ( PlaceMap
   , IOException (..)
   , readFile'

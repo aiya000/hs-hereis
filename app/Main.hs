@@ -1,6 +1,6 @@
 module Main where
 
-import Data.Hereis.Main (app)
+import Hereis.Main (app)
 import System.Environment (getArgs)
 
 main :: IO ()

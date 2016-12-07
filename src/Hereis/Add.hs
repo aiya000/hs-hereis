@@ -1,16 +1,16 @@
 {-# LANGUAGE ScopedTypeVariables #-}
 
 -- | For adding action
-module Data.Hereis.Add
+module Hereis.Add
   ( registerPlace
   ) where
 
 import Control.Monad (when)
 import Control.Monad.Catch (SomeException, catch, MonadCatch, throwM)
 import Control.Monad.IO.Class (MonadIO, liftIO)
-import Data.Hereis
 import Data.Map (insert, empty)
 import Data.Maybe (isNothing, fromJust)
+import Hereis
 import System.Directory (createDirectoryIfMissing, getCurrentDirectory)
 import System.Posix.Env (getEnv, getEnvDefault)
 
