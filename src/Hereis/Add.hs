@@ -35,7 +35,7 @@ autoMkdirHereisDir :: (MonadCatch m, MonadIO m) => m FilePath
 autoMkdirHereisDir = do
   maybeHomeDir <- getEnv' "HOME"
   when (isNothing maybeHomeDir) $ do
-    throwM $ IOException "You must set $HOME"
+    throwM $ HereisIOException "You must set $HOME"
   let homeDir = fromJust maybeHomeDir
   configDir <- (++ "/hereis") <$> getEnvDefault' "XDG_CACHE_DIR" (homeDir ++ "/.cache")
   createDirectoryIfMissing' False configDir
