@@ -10,7 +10,7 @@ import System.Console.CmdArgs (cmdArgs)
 -- >>> app []
 -- Nothing to do
 --
--- >>> import System.Directory (setCurrentDirectory)
+-- >>> import System.EasyFile (setCurrentDirectory)
 -- >>> setCurrentDirectory "/tmp"
 -- >>> app ["--add", "place-name"]
 -- Current directory was registered as 'place-name'

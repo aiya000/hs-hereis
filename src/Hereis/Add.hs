@@ -11,7 +11,7 @@ import Control.Monad.IO.Class (MonadIO, liftIO)
 import Data.Map (insert, empty)
 import Data.Maybe (isNothing, fromJust)
 import Hereis
-import System.Directory (createDirectoryIfMissing, getCurrentDirectory)
+import System.EasyFile (doesDirectoryExist, createDirectoryIfMissing)
 import System.Posix.Env (getEnv, getEnvDefault)
 
 

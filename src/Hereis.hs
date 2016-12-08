@@ -12,7 +12,7 @@ import Control.Monad.IO.Class (MonadIO)
 import Control.Monad.Trans (liftIO)
 import Control.Monad.Trans.Either (runEitherT)
 import Data.Map (Map)
-import System.Directory (doesFileExist)
+import System.EasyFile (doesFileExist)
 
 -- | Mapping nick name and file path
 type PlaceMap = Map String FilePath
