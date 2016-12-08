@@ -1,9 +1,11 @@
 -- | Module for program entry point
 module Hereis.Main ( app )  where
 
-import Control.Exception (try, SomeException)
+import Control.Monad.Catch (try, SomeException)
+import Control.Monad.Trans.Either (runEitherT)
 import Hereis.Add
 import System.Console.CmdArgs (cmdArgs)
+import System.EasyFile (getCurrentDirectory)
 
 -- | Run this app
 --
@@ -25,11 +27,12 @@ app :: [String] -> IO ()
 app [] = putStrLn "Nothing to do"
 
 app ["--add", placeName] = do
-  -- if placeName already exists, show warn message and exit
-  result <- try $ registerPlace placeName
+  currentDir <- getCurrentDirectory
+  result     <- runEitherT $ registerPlace placeName currentDir
   case result of
     Left  e -> putStrLn $ "Detected the error: " ++ show (e :: SomeException)
     Right _ -> putStrLn $ "Current directory was registered as '" ++ placeName ++ "'"
+
 app ["--get", placeName] = undefined
 
 --TODO:

@@ -5,43 +5,39 @@ module Hereis.Add
   ( registerPlace
   ) where
 
-import Control.Monad (when)
-import Control.Monad.Catch (SomeException, catch, MonadCatch, throwM)
+import Control.Monad.Catch (MonadCatch, MonadThrow, SomeException, throwM, try)
+import Control.Monad.Extra (whenM)
 import Control.Monad.IO.Class (MonadIO, liftIO)
-import Data.Map (insert, empty)
-import Data.Maybe (isNothing, fromJust)
 import Hereis
 import System.EasyFile (doesDirectoryExist, createDirectoryIfMissing)
-import System.Posix.Env (getEnv, getEnvDefault)
+import System.Posix.Env (getEnv)
+import qualified Data.Map.Lazy as Map
 
 
--- | Write current directory path as placeName to
---   child dir of $XDG_CACHE_DIR
-registerPlace :: String -> IO ()
-registerPlace placeName = do
-  configFilePath <- autoMkdirHereisDir
-  --TODO: insert to file directly
-  placeMap       <- readFile' configFilePath `catch` replaceEmpty
-  currentDirPath <- getCurrentDirectory
-  let placeMap' = insert placeName currentDirPath placeMap
-  writeFile configFilePath (show placeMap')
-    where
-      replaceEmpty :: SomeException -> IO PlaceMap
-      replaceEmpty _ = return empty
+-- | Write directory path with its nick name to ~/.cache/hereis/places
+registerPlace :: (MonadCatch m, MonadIO m) => String -> FilePath -> m ()
+registerPlace placeName targetDir = do
+  --TODO: Don't ignore the exception
+  appDir         <- makeAppDirIfNothing
+  let configFile = appDir ++ "/places"
+  -- Create empty map if configFile doesn't exist
+  eitherPlaceMap <- try . liftIO $ readFile configFile
+  let placeMap   = case eitherPlaceMap of
+                        Left  (_ :: SomeException) -> Map.empty
+                        Right a -> read a
+  let placeMap'  = Map.insert placeName targetDir placeMap
+  liftIO $ writeFile configFile $ show placeMap'
 
--- Detect filepath of serialized Data.Hereis.PlaceMap value,
--- and Make working directory if it's not exists.
-autoMkdirHereisDir :: (MonadCatch m, MonadIO m) => m FilePath
-autoMkdirHereisDir = do
-  maybeHomeDir <- getEnv' "HOME"
-  when (isNothing maybeHomeDir) $ do
-    throwM $ HereisIOException "You must set $HOME"
-  let homeDir = fromJust maybeHomeDir
-  configDir <- (++ "/hereis") <$> getEnvDefault' "XDG_CACHE_DIR" (homeDir ++ "/.cache")
-  createDirectoryIfMissing' False configDir
-  let configFile = configDir ++ "/places"
-  return configFile
-    where
-      getEnv' s                      = liftIO $ getEnv s
-      getEnvDefault' x y             = liftIO $ getEnvDefault x y
-      createDirectoryIfMissing' b fp = liftIO $ createDirectoryIfMissing b fp
+-- |
+-- Make ~/.cache/hereis directory if it doesn't exist,
+-- If $HOME is not set, throw an exception
+makeAppDirIfNothing :: (MonadThrow m, MonadIO m) => m FilePath
+makeAppDirIfNothing = do
+  mayHomeDir <- liftIO $ getEnv "HOME"
+  case mayHomeDir of
+    Nothing      -> throwM $ HereisIOException "You must set $HOME"
+    Just homeDir -> do
+      let appDir = homeDir ++ "/.cache/hereis"
+      whenM (liftIO $ doesDirectoryExist appDir) $ do
+        liftIO $ createDirectoryIfMissing True appDir
+      return appDir
